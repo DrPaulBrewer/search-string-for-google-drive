@@ -105,9 +105,9 @@ This module will correct some incorrect keys `names` to `name` and `parent` to `
 ## Empty query strings could be evil
 
 Because supplying `q=''` to Google Drive API will match all files visible to the client, we assume that this is probably not what
-you meant when you called `ssgd({...your search terms...})` and therefore `throw new Error("blank, match-all, query prohibited by configuration at search-string-for-google-drive")`.
+you meant when you called `q=ssgd({...your search terms...})` and therefore `throw new Error("blank, match-all, query prohibited by configuration at search-string-for-google-drive")`.
 
-To allow blank, match-all returns, call with a 2nd parameter `true` as in `ssgd({}, true)`
+To allow blank, match-all returns, call with a 2nd parameter `true` as in `q=ssgd({}, true)`
 
 ### Copyright
 
