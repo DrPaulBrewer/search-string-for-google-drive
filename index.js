@@ -15,11 +15,16 @@ function escape(s){
     return "'"+String(s).replace(/'/g, "\\'")+"'";	
 }
 
+
 var q = {
     "string": function(op, combiner){
 	return function(k,v){
 	    if (Array.isArray(v)){
-		return '( '+v.map((eachv)=>(k+' '+op+' '+escape(eachv))).join(' '+combiner+' ')+' )';
+		return '( '+
+		    v.map(function(eachv){
+			return (k+' '+op+' '+escape(eachv));
+		    }).join(' '+combiner+' ')+
+		    ' )';
 	    }
 	    return k+' '+op+' '+escape(v);
 	};
@@ -27,7 +32,7 @@ var q = {
 
     "boolean": function(){
 	return function(k,v){
-	    if ( (typeof(v)==='string') && (v.startsWith("F") || v.startsWith("f") || (v==="0")) )
+	    if ( (typeof(v)==='string') && (v.charAt(0)==="F" || v.charAt(0)==="f" || v==="0") )
 		v = false;
 	    return k+' = '+(!!v);
 	};
@@ -36,7 +41,11 @@ var q = {
     "collection": function(combiner){
 	return function(k,v){
 	    if (Array.isArray(v)){
-		return '( '+v.map((eachv)=>(escape(eachv)+' in '+k)).join(' '+combiner+' ')+' )';
+		return '( '+
+		    v.map(function(eachv){
+			return escape(eachv)+' in '+k;
+		    }).join(' '+combiner+' ')+
+		    ' )';
 	    }
 	    return escape(v)+' in '+k;
 	};
@@ -44,7 +53,10 @@ var q = {
     
     "hash": function(){
 	return function(k,v){
-	    return Object.keys(v).map((hk)=>(k+' has { key='+escape(hk)+' and value='+escape(v[hk])+' }')).join(' and ');
+	    return Object.keys(v).map(
+		function(hk){
+		    return k+' has { key='+escape(hk)+' and value='+escape(v[hk])+' }';
+		}).join(' and ');
 	};
     }
 };
@@ -66,19 +78,48 @@ var handlers = {
 };
 
 
-module.exports = function(spec){
-    var queries = Object.keys(spec).map((k)=>{
-	if (typeof(handlers[k])==='function')
-	    return (handlers[k])(k,spec[k]);
-	// fix singular<-->plural
-	var lastChar = k.charAt(k.length-1);
-	var kPlural = (lastChar!=='s')? k+'s' : false;
-	var kSingular = (lastChar==='s')? k.substr(0,k.length-1): false;
-	if (kPlural && (typeof(handlers[kPlural])==='function'))
-	    return (handlers[kPlural])(kPlural,spec[k]);
-	if (kSingular && (typeof(handlers[kSingular]==='function')))
-	    return (handlers[kSingular])(kSingular,spec[k]);
-	throw new Error("search key "+escape(k)+" unsupported");
-    });
-    return queries.join(' and ');
+function ssgd(spec, matchAll){
+    var queries = (
+	Object.keys(spec)
+	    .filter(function(k){ return (spec[k]!==undefined) && (spec[k]!==null); })
+	    .map(function(k){ 
+		if (typeof(handlers[k])==='function')
+		    return (handlers[k])(k,spec[k]);
+		// fix singular<-->plural
+		var lastChar = k.charAt(k.length-1);
+		var kPlural = (lastChar!=='s')? k+'s' : false;
+		var kSingular = (lastChar==='s')? k.substr(0,k.length-1): false;
+		if (kPlural && (typeof(handlers[kPlural])==='function'))
+		    return (handlers[kPlural])(kPlural,spec[k]);
+		if (kSingular && (typeof(handlers[kSingular]==='function')))
+		    return (handlers[kSingular])(kSingular,spec[k]);
+		throw new Error("search key "+escape(k)+" unsupported");
+	    })
+    );
+    var q = queries.join(' and ');
+    if ((q.length===0) && (matchAll))
+	return q;
+    if (q.length>0)
+	return q;
+    throw new Error("blank, match-all, query prohibited by configuration at search-string-for-google-drive");
+}
+
+ssgd.supported = function(){
+    return Object.keys(handlers);
 };
+
+ssgd.isSupported = function(k){
+    return (k in handlers) && (handlers.hasOwnProperty(k));
+};
+
+ssgd.extract = function(slop){
+    var spec = {};
+    Object.keys(handlers).forEach(function(k){
+	if ((k in slop) && (slop.hasOwnProperty(k))){
+	    spec[k] = slop[k];
+	}
+    });
+    return spec;
+};
+    
+module.exports = ssgd;

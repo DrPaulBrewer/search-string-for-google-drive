@@ -70,9 +70,81 @@ const typos = [
     { apProperties: { x: 'yz' } },
     { vizibility: "limited" }
 ];
+
+// example with all supported terms
+
+const example = { 
+    name: 'recipe.txt',
+    fullText: 'add 3 cups apple sauce',
+    mimeType: 'text/plain',
+    trashed: false,
+    starred: true,
+    parents: 'root',
+    owners: 'abc@gmail.com',
+    readers: 'xyz@gmail.com',
+    writers: 'qaz@gmail.com',
+    sharedWithMe: true,
+    properties: { x: 0, y:0, z:0, when: "now" },
+    appProperties: { paidInBitcoin: false },
+    visibility: 'limited'
+};
+
     
+const goodTerms = Object.keys(example);
+const badTerms = typos.map((o)=>(Object.keys(o)[0]));
 
 describe('search-string-for-google-drive: ', function(){
+
+    it('should have function properties .supported, .isSupported, .extract exists ', function(){
+	ssgd.should.have.properties(['supported','isSupported','extract']);
+    });
+
+    describe('ssgd.supported() should return an array including all supported search terms ',function(){
+	it('should return an array', function(){
+	    assert.ok(Array.isArray(ssgd.supported()));
+	});
+	goodTerms.sort().forEach((k)=>{
+	    it(k, function(){
+		assert.ok(ssgd.supported().includes(k));
+	    });
+	});
+    });
+
+    describe('ssgd.isSupported(k) should return true for supported terms and false for bad terms ', function(){
+	goodTerms.forEach((k)=>{
+	    it(k+' --> true ', function(){
+		assert.ok(ssgd.isSupported(k));
+	    });
+	});
+	badTerms.forEach((k)=>{
+	    it(k+' --> false ', function(){
+		assert.ok(!ssgd.isSupported(k));
+	    });
+	});
+    });
+
+    describe('ssgd.extract(obj) will create an object extracting supported terms only from obj ', function(){
+	const mix = {
+	    junk: 1,
+	    trashed: 1
+	};
+	it('{junk:1, trashed: 1} --> (ssgd.extract) --> { trashed: 1 } ', function(){
+	    ssgd.extract(mix).should.deepEqual({trashed: 1});
+	});
+    });
+
+    describe('empty searches (which will match all files!) will throw an error unless allowed via 2nd parameter: ', function(){
+	it('ssgd({}) --> Error ', function(){
+	    function bad(){
+		const q = ssgd({});
+	    }
+	    bad.should.throw();
+	});
+	it('ssgd({}, true) --> ""', function(){
+	    ssgd({}, true).should.equal("");
+	});
+    });
+    
     describe('single search terms:', function(){
         singles.forEach((spec)=>{
             const item = spec[0];
@@ -84,16 +156,18 @@ describe('search-string-for-google-drive: ', function(){
         });
     });
     
-    describe('typos or unknown keys throw an error', function(){
-        typos.forEach((spec)=>{
-            const item = spec;
-            it(JSON.stringify(item)+' --> Error', function(){
-                function bad(){
-                    const result = ssgd(item);
-                }
-                bad.should.throw();
+    describe('typos or unknown keys: ', function(){
+	describe(' throw an error ', function(){
+            typos.forEach((spec)=>{
+		const item = spec;
+		it(JSON.stringify(item)+' --> Error', function(){
+                    function bad(){
+			const result = ssgd(item);
+                    }
+                    bad.should.throw();
+		});
             });
-        });
+	});
     });
 
     function checkArrays(source, combiner){
@@ -142,21 +216,6 @@ describe('search-string-for-google-drive: ', function(){
     });
 
     describe('example from README.md ', function(){
-        const example = { 
-            name: 'recipe.txt',
-            fullText: 'add 3 cups apple sauce',
-            mimeType: 'text/plain',
-            trashed: false,
-            starred: true,
-            parents: 'root',
-            owners: 'abc@gmail.com',
-            readers: 'xyz@gmail.com',
-            writers: 'qaz@gmail.com',
-            sharedWithMe: true,
-            properties: { x: 0, y:0, z:0, when: "now" },
-            appProperties: { paidInBitcoin: false },
-            visibility: 'limited'
-        };
         const q = ssgd(example);
         it('q should have 21 and clauses', function(){
             q.split('and').length.should.equal(21);
@@ -171,5 +230,32 @@ describe('search-string-for-google-drive: ', function(){
                 });
             });
         });
+
+	function testRemoveClauses(rm,how){ 	
+	    describe('as we '+how+' the number of " and " clauses should decrease', function(){
+		const example2 = Object.assign({}, example);
+		const q = ssgd(example2);
+		const keys = Object.keys(example2);
+		let clauses = q.split(' and ').length;
+		keys.forEach((k)=>{
+		    function a(){ return ands; }
+		    it(k, function(){
+			rm(example2,k);
+			const newq = ssgd(example2, true);
+			const newClauses = (newq.length===0)? 0: newq.split('and').length;
+			newClauses.should.be.below(clauses);
+			clauses = newClauses;
+		    });
+		});
+	    });;
+	}
+
+	testRemoveClauses((q,k)=>{ delete q[k]; },
+			  'delete keys');
+	
+	testRemoveClauses((q,k)=>{q[k] = undefined; },
+			  'set keys to undefined');
+
+	
     });
 });

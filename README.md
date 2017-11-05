@@ -17,7 +17,11 @@ It does not call any API functions.  Tests check that it produces strings as des
 
 ## Dependencies
 
-None.  Suitable for usage on nodejs or on the browser, via browserify/webpack/jspm/etc.
+None.  Suitable for usage on modern browsers or nodejs.
+
+## JS Engine Compatiblity
+
+The main index.js source file should contain only ES5 code.  Tests contain some more modern code.
 
 ## Initialization
 
@@ -35,7 +39,17 @@ None.  Suitable for usage on nodejs or on the browser, via browserify/webpack/js
 
 The time/date clauses are not currently supported.  
 
-Here is an example showing every clause.  To understand what they do, refer to the Google Documentation linked above.
+There are some helpers methods defined as additional function properties.  
+
+You can get an array of supported clause keywords from `ssgd.supported()`
+
+You can test if `k` is supported with `ssgd.isSupported(k)`
+
+You can extract all the supported clauses from `sloppyObj` into `supportedObj` with  `var supportedObj = ssgd.extract(sloppyObj)`
+
+## Example showing every supported clause
+
+Here is an example showing every supported clause.  To understand what they do, refer to the Google Documentation linked above.
 
 ```
 { 
@@ -65,7 +79,7 @@ Creates an Or-clause for the mapped clauses:  name, mimeType, parents, owners, r
 
 Creates an And-Clause for the mapped clauses: fullText
 
-## Practical Examples
+## Additional Examples
 
 ```
 q = ssgd({ name: 'Hello.txt' });  // searches for files named "Hello.txt"
