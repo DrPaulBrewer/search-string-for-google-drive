@@ -74,70 +74,102 @@ const typos = [
 
 describe('search-string-for-google-drive: ', function(){
     describe('single search terms:', function(){
-	singles.forEach((spec)=>{
-	    const item = spec[0];
-	    const expected = spec[1];
-	    it(JSON.stringify(item)+' --> '+JSON.stringify(expected), function(){
-		const result = ssgd(item);
-		result.should.equal(expected);
-	    });
-	});
+        singles.forEach((spec)=>{
+            const item = spec[0];
+            const expected = spec[1];
+            it(JSON.stringify(item)+' --> '+JSON.stringify(expected), function(){
+                const result = ssgd(item);
+                result.should.equal(expected);
+            });
+        });
     });
     
     describe('typos or unknown keys throw an error', function(){
-	typos.forEach((spec)=>{
-	    const item = spec;
-	    it(JSON.stringify(item)+' --> Error', function(){
-		function bad(){
-		    const result = ssgd(item);
-		}
-		bad.should.throw();
-	    });
-	});
+        typos.forEach((spec)=>{
+            const item = spec;
+            it(JSON.stringify(item)+' --> Error', function(){
+                function bad(){
+                    const result = ssgd(item);
+                }
+                bad.should.throw();
+            });
+        });
     });
 
     function checkArrays(source, combiner){
-	source.forEach((spec)=>{
-	    const k = Object.keys(spec)[0];
-	    const vs = spec[k];
-	    const A = {};
-	    const B = {};
-	    A[k] = vs[0];
-	    B[k] = vs[1];
-	    const correct = [
-		'( '+ssgd(A)+combiner+ssgd(B)+' )',
-		'( '+ssgd(B)+combiner+ssgd(A)+' )'
-	    ];
-	    it(JSON.stringify(spec)+"-->"+JSON.stringify(correct[0]), function(){
-		assert.ok(correct.includes(ssgd(spec)));
-	    });
-	});
+        source.forEach((spec)=>{
+            const k = Object.keys(spec)[0];
+            const vs = spec[k];
+            const A = {};
+            const B = {};
+            A[k] = vs[0];
+            B[k] = vs[1];
+            const correct = [
+                '( '+ssgd(A)+combiner+ssgd(B)+' )',
+                '( '+ssgd(B)+combiner+ssgd(A)+' )'
+            ];
+            it(JSON.stringify(spec)+"-->"+JSON.stringify(correct[0]), function(){
+                assert.ok(correct.includes(ssgd(spec)));
+            });
+        });
     }
     
     describe('arrays supplied to these elements yield "( or )" clauses', function(){
-	checkArrays(orArrays, " or ");
+        checkArrays(orArrays, " or ");
     });
     
     describe('arrays supplied to these elements yield "( and )" clauses', function(){
-	checkArrays(andArrays, " and ");
+        checkArrays(andArrays, " and ");
     });
 
     describe('pairs of single properties are concatenated with " and " ', function(){
-	singles.forEach((spec1)=>{
-	    const k1 = Object.keys(spec1[0])[0];
-	    singles.forEach((spec2)=>{
-		const k2 = Object.keys(spec2[0])[0];
-		if (k1!==k2){
-		    const spec = Object.assign({},spec1[0],spec2[0]);
-		    const correct = [
-			spec1[1]+" and "+spec2[1],
-			spec2[1]+" and "+spec1[1]
-		    ];
-		    it(JSON.stringify(spec)+"-->"+JSON.stringify(correct[0]), function(){
-			assert.ok(correct.includes(ssgd(spec)));
-		    });
-		}
-	    });
-	});
+        singles.forEach((spec1)=>{
+            const k1 = Object.keys(spec1[0])[0];
+            singles.forEach((spec2)=>{
+                const k2 = Object.keys(spec2[0])[0];
+                if (k1!==k2){
+                    const spec = Object.assign({},spec1[0],spec2[0]);
+                    const correct = [
+                        spec1[1]+" and "+spec2[1],
+                        spec2[1]+" and "+spec1[1]
+                    ];
+                    it(JSON.stringify(spec)+"-->"+JSON.stringify(correct[0]), function(){
+                        assert.ok(correct.includes(ssgd(spec)));
+                    });
+                }
+            });
+        });
+    });
+
+    describe('example from README.md ', function(){
+        const example = { 
+            name: 'recipe.txt',
+            fullText: 'add 3 cups apple sauce',
+            mimeType: 'text/plain',
+            trashed: false,
+            starred: true,
+            parents: 'root',
+            owners: 'abc@gmail.com',
+            readers: 'xyz@gmail.com',
+            writers: 'qaz@gmail.com',
+            sharedWithMe: true,
+            properties: { x: 0, y:0, z:0, when: "now" },
+            appProperties: { paidInBitcoin: false },
+            visibility: 'limited'
+        };
+        const q = ssgd(example);
+        it('q should have 21 and clauses', function(){
+            q.split('and').length.should.equal(21);
+        });
+        describe('q should contain every single key clause', function(){
+            Object.keys(example).forEach((k)=>{
+                const singlet = {};
+                singlet[k] = example[k];
+                expected = ssgd(singlet);
+                it(JSON.stringify(singlet)+' --> '+expected, function(){
+                    assert.ok(q.includes(expected));
+                });
+            });
+        });
     });
 });
