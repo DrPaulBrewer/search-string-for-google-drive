@@ -9,6 +9,8 @@
 
 /* jshint browser:true,node:true,esnext:true,eqeqeq:true,undef:true,lastsemic:true,strict:true */
 
+"use strict";
+
 function escape(s){
     return "'"+String(s).replace(/'/g, "\\'")+"'";	
 }
