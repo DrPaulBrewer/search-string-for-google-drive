@@ -1,0 +1,27 @@
+{
+  "name": "search-string-for-google-drive",
+  "version": "0.0.1",
+  "description": "helper function to create query string for drive.files.list when using Google Drive API v3",
+  "main": "index.js",
+  "repository": "drpaulbrewer/search-string-for-google-drive",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha --reporter spec --slow 50 --timeout 2000",
+    "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*"
+  },
+  "keywords": [
+    "google-drive",
+    "file",
+    "search"
+  ],
+  "author": "drpaulbrewer@eaftc.com",
+  "license": "MIT",
+  "devDependencies": {
+    "coveralls": "^3.0.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^4.0.1",
+    "should": "^13.1.3"
+  }
+}
