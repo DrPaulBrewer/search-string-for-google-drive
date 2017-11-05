@@ -86,7 +86,7 @@ const example = {
     sharedWithMe: true,
     properties: { x: 0, y:0, z:0, when: "now" },
     appProperties: { paidInBitcoin: false },
-    visibility: 'limited'
+    visibility: 'anyoneWithLink'
 };
 
     

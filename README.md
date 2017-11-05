@@ -49,7 +49,16 @@ You can extract all the supported clauses from `sloppyObj` into `supportedObj` w
 
 ## Example showing every supported clause
 
-Here is an example showing every supported clause.  To understand what they do, refer to the Google Documentation linked above.
+Here is an example showing every supported clause.  
+
+The example below would search for a file named `recipe.txt` containing "add 3 cups apple sauce" in the searchable text
+and meta-fields like `description`, that is a file of mime Type `text/plain`, not in the trash, starred (marked as a favorite) by the user,
+in the root directory of Drive (not in a sub-folder), with the indicated owners, readers, and writers, that has been
+shared with me (it is not my own file), with the listed custom properties and hidden appProperties that are app-defined, and is shared where 
+anyone with the link can see the file.  
+
+For more information about searching for files in Drive API, refer to the [Google Drive API Documentation](https://developers.google.com/drive/v3/web/search-parameters).
+
 
 ```
 { 
@@ -65,7 +74,7 @@ Here is an example showing every supported clause.  To understand what they do, 
    sharedWithMe: true,
    properties: { x: 0, y:0, z:0, when: "now" },
    appProperties: { paidInBitcoin: false },
-   visibility: 'limited'
+   visibility: 'anyoneWithLink'
 }
 ```
 
@@ -92,6 +101,13 @@ q = ssgd({ mimeType: 'application/zip', name: ['data.zip','rawdata.zip'], parent
 ## Single/Plural corrections
 
 This module will correct some incorrect keys `names` to `name` and `parent` to `parents`, but you should not be relying on that.
+
+## Empty query strings could be evil
+
+Because supplying `q=''` to Google Drive API will match all files visible to the client, we assume that this is probably not what
+you meant when you called `ssgd({...your search terms...})` and therefore `throw new Error("blank, match-all, query prohibited by configuration at search-string-for-google-drive")`.
+
+To allow blank, match-all returns, call with a 2nd parameter `true` as in `ssgd({}, true)`
 
 ### Copyright
 
