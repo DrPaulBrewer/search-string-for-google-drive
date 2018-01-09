@@ -6,6 +6,8 @@ const assert = require('assert');
 const should = require('should');
 const ssgd = require("../index.js");
 
+const folderMimeType = 'application/vnd.google-apps.folder';
+
 const singles = [
     [ { name: 'Hello.txt'}, "name = 'Hello.txt'" ],
     [ { name: "Eat at Moe's"}, "name = 'Eat at Moe\\\'s'"],
@@ -37,7 +39,9 @@ const singles = [
     [ { properties: { role: 'tick data' }}, "properties has { key='role' and value='tick data' }" ],
     [ { properties: { x: 35 }}, "properties has { key='x' and value='35' }" ],
     [ { appProperties: { paid: true } }, "appProperties has { key='paid' and value='true' }" ],
-    [ { visibility: "limited" }, "visibility = 'limited'" ]
+    [ { visibility: "limited" }, "visibility = 'limited'" ],
+    [ { isFolder: true }, `mimeType = '${folderMimeType}'` ],
+    [ { isFolder: false }, `mimeType != '${folderMimeType}'` ]
 ];
 
 const orArrays = [
@@ -73,7 +77,8 @@ const typos = [
 
 // example with all supported terms
 
-const example = { 
+const example = {
+    isFolder: false,
     name: 'recipe.txt',
     fullText: 'add 3 cups apple sauce',
     mimeType: 'text/plain',
@@ -217,8 +222,8 @@ describe('search-string-for-google-drive: ', function(){
 
     describe('example from README.md ', function(){
         const q = ssgd(example);
-        it('q should have 21 and clauses', function(){
-            q.split('and').length.should.equal(21);
+        it('q should have 22 and clauses', function(){
+            q.split('and').length.should.equal(22);
         });
         describe('q should contain every single key clause', function(){
             Object.keys(example).forEach((k)=>{

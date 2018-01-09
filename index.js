@@ -2,7 +2,7 @@
  * search-string-for-google-drive -- creates search string for Drive API v3 drive.files.list "q" parameter
  * This is a helper function for creating the "q" query string described in https://developers.google.com/drive/v3/web/search-parameters
  *
- *  Copyright 2017 Paul Brewer, Economic and Financial Technology Consulting LLC <drpaulbrewer@eaftc.com>
+ *  Copyright 2017-2018 Paul Brewer, Economic and Financial Technology Consulting LLC <drpaulbrewer@eaftc.com>
  *  This file is open source software.  License: The MIT License
  *
  */
@@ -10,6 +10,8 @@
 /* jshint browser:true,node:true,esnext:true,eqeqeq:true,undef:true,lastsemic:true,strict:true */
 
 "use strict";
+
+const folderMimeType = 'application/vnd.google-apps.folder';
 
 function escape(s){
     return "'"+String(s).replace(/'/g, "\\'")+"'";	
@@ -58,6 +60,15 @@ var q = {
 		    return k+' has { key='+escape(hk)+' and value='+escape(v[hk])+' }';
 		}).join(' and ');
 	};
+    },
+
+    "isFolder": function(){
+	return function(k,v){
+	    if ( (typeof(v)==='string') && (v.charAt(0)==="F" || v.charAt(0)==="f" || v==="0") )
+		v = false;
+	    var sep = (v)? ' = ' : ' != ' ;
+	    return 'mimeType'+sep+escape(folderMimeType);
+	};
     }
 };
 
@@ -74,7 +85,8 @@ var handlers = {
     sharedWithMe: q.boolean(),
     properties: q.hash('and'),
     appProperties: q.hash('and'),
-    visibility: q.string('=','or')
+    visibility: q.string('=','or'),
+    isFolder: q.isFolder()
 };
 
 

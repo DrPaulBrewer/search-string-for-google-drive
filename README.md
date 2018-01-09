@@ -37,7 +37,9 @@ The main index.js source file should contain only ES5 code.  Tests contain some 
 
 ## Supported clauses
 
-The time/date clauses are not currently supported.  
+The Google time/date clauses are not currently supported.  
+
+There is an additional (non-Google) special clause 'isFolder: true | false' that is translated to 'mimeType = 'application/vnd.google-apps.folder' or 'mimeType != 'application/vnd.google-apps.folder'.__
 
 There are some helpers methods defined as additional function properties.  
 
@@ -51,7 +53,7 @@ You can extract all the supported clauses from `sloppyObj` into `supportedObj` w
 
 Here is an example showing every supported clause.  
 
-The example below would search for a file named `recipe.txt` containing "add 3 cups apple sauce" in the searchable text
+The example below would search for a file that is not a folder, named `recipe.txt` containing "add 3 cups apple sauce" in the searchable text
 and meta-fields like `description`, that is a file of mime Type `text/plain`, not in the trash, starred (marked as a favorite) by the user,
 in the root directory of Drive (not in a sub-folder), with the indicated owners, readers, and writers, that has been
 shared with me (it is not my own file), with the listed custom properties and hidden appProperties that are app-defined, and is shared where 
@@ -62,6 +64,7 @@ For more information about searching for files in Drive API, refer to the [Googl
 
 ```
 { 
+   isFolder: false,
    name: 'recipe.txt',
    fullText: 'add 3 cups apple sauce',
    mimeType: 'text/plain',
