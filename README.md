@@ -1,7 +1,7 @@
 search-string-for-google-drive
 ----------
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/DrPaulBrewer/search-string-for-google-drive.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/DrPaulBrewer/search-string-for-google-drive.svg?branch=master)](https://travis-ci.org/DrPaulBrewer/search-string-for-google-drive)
 [![Coverage Status](https://coveralls.io/repos/github/DrPaulBrewer/search-string-for-google-drive/badge.svg?branch=master)](https://coveralls.io/github/DrPaulBrewer/search-string-for-google-drive?branch=master)
 
