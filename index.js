@@ -103,7 +103,7 @@ function ssgd(spec, matchAll){
 		var kSingular = (lastChar==='s')? k.substr(0,k.length-1): false;
 		if (kPlural && (typeof(handlers[kPlural])==='function'))
 		    return (handlers[kPlural])(kPlural,spec[k]);
-		if (kSingular && (typeof(handlers[kSingular]==='function')))
+		if (kSingular && (typeof(handlers[kSingular])==='function'))
 		    return (handlers[kSingular])(kSingular,spec[k]);
 		throw new Error("search key "+escape(k)+" unsupported");
 	    })
