@@ -2,9 +2,6 @@ search-string-for-google-drive
 ----------
 
 
-[![Build Status](https://travis-ci.org/DrPaulBrewer/search-string-for-google-drive.svg?branch=master)](https://travis-ci.org/DrPaulBrewer/search-string-for-google-drive)
-[![Coverage Status](https://coveralls.io/repos/github/DrPaulBrewer/search-string-for-google-drive/badge.svg?branch=master)](https://coveralls.io/github/DrPaulBrewer/search-string-for-google-drive?branch=master)
-
 Constructs query search string needed by Google Drive[tm] API v3 [drive.files.list](https://developers.google.com/drive/v3/reference/files/list)
 
 This is a helper function for creating the "q" query string documented in  https://developers.google.com/drive/v3/web/search-parameters
@@ -17,7 +14,7 @@ It does not call any API functions.  Tests check that it produces strings as des
 
 ## Dependencies
 
-None.  Suitable for usage on modern browsers or nodejs.
+None.  Suitable for usage on circa 2020 browsers or nodejs.
 
 ## JS Engine Compatiblity
 
@@ -29,10 +26,10 @@ The main index.js source file should contain only ES5 code.  Tests contain some 
 
 ## Usage
 
-`{...}` is a placeholder for additional code 
+`{...}` is a placeholder for additional code
 
-    const q = ssgd({...your object defining a search...});
-	gapi.client.drive.files.list({q, ...}).then({...}); // gapi on browser. 
+  const q = ssgd({...your object defining a search...});
+	gapi.client.drive.files.list({q, ...}).then({...}); // gapi on browser.
 	drive.files.list({q, ...}, function(e,result){...}); // googleapis on nodejs
 
 ## Supported clauses
@@ -56,14 +53,14 @@ Here is an example showing every supported clause.
 The example below would search for a file that is not a folder, named `recipe.txt` containing "add 3 cups apple sauce" in the searchable text
 and meta-fields like `description`, that is a file of mime Type `text/plain`, not in the trash, starred (marked as a favorite) by the user,
 in the root directory of Drive (not in a sub-folder), with the indicated owners, readers, and writers, that has been
-shared with me (it is not my own file), with the listed custom properties and hidden appProperties that are app-defined, and is shared where 
+shared with me (it is not my own file), with the listed custom properties and hidden appProperties that are app-defined, and is shared where
 anyone with the link can see the file.  
 
 For more information about searching for files in Drive API, refer to the [Google Drive API Documentation](https://developers.google.com/drive/v3/web/search-parameters).
 
 
 ```
-{ 
+{
    isFolder: false,
    name: 'recipe.txt',
    fullText: 'add 3 cups apple sauce',
@@ -98,7 +95,7 @@ q = ssgd({ name: 'Hello.txt' });  // searches for files named "Hello.txt"
 q = ssgd({ name: 'Hello.txt', parents: 'root' }); // searches for file named "Hello.txt" in the root directory
 q = ssgd({ name: 'savedSession', trashed: true, mimeType: ['application/json','text/plain'] }); // searches for file named 'savedSession' in the Trash and is a json or a text file
 q = ssgd({ appProperties: {'cheated': 'true', why: 'neverDies' } }); // seaches for any file where the custom app property 'cheated' is set to the string 'true' and custom app property 'why' is set to 'neverDies'
-q = ssgd({ mimeType: 'application/zip', name: ['data.zip','rawdata.zip'], parents: [folderA.id, folderB.id] }); // searches for a zip file named data.zip or rawdata.zip in either of two folders 
+q = ssgd({ mimeType: 'application/zip', name: ['data.zip','rawdata.zip'], parents: [folderA.id, folderB.id] }); // searches for a zip file named data.zip or rawdata.zip in either of two folders
 ```
 
 ## Single/Plural corrections
@@ -131,5 +128,3 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 This software is 3rd party software. This software is not a product of Google, Inc.
 
 Google Drive[tm] is a trademark of Google, Inc.
-
-

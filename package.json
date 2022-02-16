@@ -8,8 +8,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "jshint index.js && mocha --reporter spec --slow 50 --timeout 2000",
-    "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*"
+    "lint": "eslint index.js",
+    "lint-test": "eslint test/index.js",
+    "test": "c8 --100 --reporter=text mocha  --slow 50 --timeout 2000",
+    "go": "npm run lint && npm run lint-test && npm run test"
   },
   "keywords": [
     "google-drive",
@@ -19,10 +21,9 @@
   "author": "drpaulbrewer@eaftc.com",
   "license": "MIT",
   "devDependencies": {
-    "coveralls": "^3.0.0",
-    "istanbul": "^0.4.5",
-    "jshint": "^2.13.4",
-    "mocha": "^5.0.0",
-    "should": "^13.1.3"
+    "c8": "^7.11.0",
+    "eslint": "^8.9.0",
+    "mocha": "^9.2.0",
+    "should": "^13.2.3"
   }
 }
